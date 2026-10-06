@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="PriceTrack - simple price tracking dashboard" />
+  <title>PriceTrack Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="toast" class="toast" role="status"></div>
+
+  <section id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="brand-mark">₹</div>
+      <p class="eyebrow">PRICE TRACKER</p>
+      <h1>Track prices.<br><span>Buy smarter.</span></h1>
+      <p class="muted">Monitor products, compare prices and keep your savings in one dashboard.</p>
+      <form id="loginForm">
+        <label>Username<input id="username" autocomplete="username" required placeholder="Enter username" /></label>
+        <label>Password<input id="password" type="password" autocomplete="current-password" required placeholder="Enter password" /></label>
+        <button class="primary-btn" type="submit">Sign in <span>→</span></button>
+        <p id="loginError" class="error"></p>
+      </form>
+      <div class="demo-hint">Demo login: <strong>kiran</strong> / <strong>123</strong></div>
+    </div>
+  </section>
+
+  <div id="app" class="app hidden">
+    <aside class="sidebar">
+      <div class="logo"><div class="brand-mark small">₹</div><div><strong>PriceTrack</strong><small>SMART MONITOR</small></div></div>
+      <nav>
+        <button class="nav-item active" data-section="overview">⌂ <span>Overview</span></button>
+        <button class="nav-item" data-section="products">▣ <span>My Products</span></button>
+        <button class="nav-item" data-section="history">◷ <span>Price History</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="mini-user"><div class="avatar">K</div><div><strong>Kiran</strong><small>Tracker account</small></div></div>
+        <button id="logoutBtn" class="logout">↪ Sign out</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">DASHBOARD</p>
+          <h2 id="pageTitle">Overview</h2>
+        </div>
+        <div class="top-actions">
+          <button id="refreshBtn" class="icon-btn" title="Refresh prices">↻</button>
+          <div class="profile"><div class="avatar">K</div><span>Kiran</span></div>
+        </div>
+      </header>
+
+      <section id="overviewSection" class="section">
+        <div class="welcome">
+          <div><p class="eyebrow">WELCOME BACK, KIRAN</p><h1>Your prices at a glance.</h1><p>Stay on top of your tracked products and never miss a good deal.</p></div>
+          <button id="addProductHero" class="primary-btn">+ Track product</button>
+        </div>
+        <div class="stats-grid">
+          <article class="stat-card"><div class="stat-icon purple">▣</div><div><span>Tracked products</span><strong id="totalProducts">0</strong></div></article>
+          <article class="stat-card"><div class="stat-icon green">↓</div><div><span>Price drops</span><strong id="priceDrops">0</strong></div></article>
+          <article class="stat-card"><div class="stat-icon orange">₹</div><div><span>Potential savings</span><strong id="savings">₹0</strong></div></article>
+          <article class="stat-card"><div class="stat-icon blue">⌁</div><div><span>Best current price</span><strong id="bestPrice">₹0</strong></div></article>
+        </div>
+        <div class="content-grid">
+          <article class="panel chart-panel">
+            <div class="panel-head"><div><h3>Price overview</h3><p>Average price of your tracked products</p></div><select id="chartRange"><option value="7">Last 7 days</option><option value="30">Last 30 days</option></select></div>
+            <div class="chart-wrap"><canvas id="priceChart"></canvas></div>
+          </article>
+          <article class="panel">
+            <div class="panel-head"><div><h3>Recent drops</h3><p>Products with the biggest savings</p></div></div>
+            <div id="recentDrops" class="drop-list"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="productsSection" class="section hidden">
+        <div class="section-heading"><div><p class="eyebrow">PRODUCTS</p><h1>My products</h1><p>Track prices and set your target price.</p></div><button id="addProductBtn" class="primary-btn">+ Add product</button></div>
+        <div class="toolbar"><div class="search"><span>⌕</span><input id="searchInput" placeholder="Search products..." /></div><select id="sortSelect"><option value="recent">Recently added</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option><option value="drop">Biggest drop</option></select></div>
+        <div id="productGrid" class="product-grid"></div>
+      </section>
+
+      <section id="historySection" class="section hidden">
+        <div class="section-heading"><div><p class="eyebrow">HISTORY</p><h1>Price history</h1><p>See how tracked prices have changed.</p></div></div>
+        <div class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>Product</th><th>Current</th><th>Previous</th><th>Change</th><th>Target</th><th>Status</th></tr></thead><tbody id="historyTable"></tbody></table></div></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <button id="closeModal" class="close">×</button>
+      <p class="eyebrow">NEW TRACKER</p><h2>Add a product</h2><p class="muted">Enter the product details to start monitoring its price.</p>
+      <form id="productForm">
+        <label>Product name<input id="productName" required placeholder="e.g. Sony WH-1000XM5" /></label>
+        <div class="form-row"><label>Current price<input id="productPrice" type="number" min="1" required placeholder="8999" /></label><label>Target price<input id="targetPrice" type="number" min="1" required placeholder="7499" /></label></div>
+        <label>Store / website<input id="productStore" required placeholder="e.g. Amazon" /></label>
+        <label>Product URL <span class="optional">(optional)</span><input id="productUrl" type="url" placeholder="https://..." /></label>
+        <button class="primary-btn full" type="submit">Start tracking</button>
+      </form>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
